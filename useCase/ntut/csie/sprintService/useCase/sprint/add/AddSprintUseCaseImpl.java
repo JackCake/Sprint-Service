@@ -1,5 +1,6 @@
 package ntut.csie.sprintService.useCase.sprint.add;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,9 +39,19 @@ public class AddSprintUseCaseImpl implements AddSprintUseCase, AddSprintInput {
 					daily(input.getDaily()).
 					productId(input.getProductId()).
 					build();
+			if(sprint.isSprintStartDateAfterEndDate()) {
+				output.setAddSuccess(false);
+				output.setErrorMessage("Sorry, the start date must be before the end date!");
+				return;
+			}
+			if(sprint.isSprintStartDateAfterDemoDate()) {
+				output.setAddSuccess(false);
+				output.setErrorMessage("Sorry, the start date must be before the demo date!");
+				return;
+			}
 			if(isSprintOverlap(sprint)) {
 				output.setAddSuccess(false);
-				output.setErrorMessage("Sorry, the start date or the end date is overlap with the other sprint.");
+				output.setErrorMessage("Sorry, the start date or the end date is overlap with the other sprint!");
 				return;
 			}
 			sprintRepository.save(sprint);
@@ -52,7 +63,7 @@ public class AddSprintUseCaseImpl implements AddSprintUseCase, AddSprintInput {
 		output.setAddSuccess(true);
 	}
 	
-	private boolean isSprintOverlap(Sprint thisSprint) {
+	private boolean isSprintOverlap(Sprint thisSprint) throws ParseException {
 		List<Sprint> sprintList = new ArrayList<>(sprintRepository.getSprintsByProductId(thisSprint.getProductId()));
 		for(Sprint otherSprint : sprintList) {
 			String otherStartDate = otherSprint.getStartDate();

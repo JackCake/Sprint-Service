@@ -18,11 +18,11 @@ public class CommitBacklogItemToSprintUseCaseImpl implements CommitBacklogItemTo
 		Sprint sprint = sprintRepository.getSprintById(input.getSprintId());
 		if(sprint == null) {
 			output.setCommitSuccess(false);
-			output.setErrorMessage("Sorry, the sprint is not exist.");
+			output.setErrorMessage("Sorry, the sprint is not exist!");
 			return;
 		}
-		sprint.commit(input.getBacklogItemId());
 		try {
+			sprint.commit(input.getBacklogItemId());
 			sprintRepository.save(sprint);
 		} catch (Exception e) {
 			output.setCommitSuccess(false);

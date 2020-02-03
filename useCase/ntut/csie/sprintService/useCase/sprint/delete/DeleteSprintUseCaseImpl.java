@@ -21,7 +21,7 @@ public class DeleteSprintUseCaseImpl implements DeleteSprintUseCase ,DeleteSprin
 		Sprint sprint = sprintRepository.getSprintById(sprintId);
 		if(sprint == null) {
 			output.setDeleteSuccess(false);
-			output.setErrorMessage("Sorry, the sprint is not exist.");
+			output.setErrorMessage("Sorry, the sprint is not exist!");
 			return;
 		}
 		int orderId = sprint.getOrderId();

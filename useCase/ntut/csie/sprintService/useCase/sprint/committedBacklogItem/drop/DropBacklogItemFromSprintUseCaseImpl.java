@@ -18,7 +18,7 @@ public class DropBacklogItemFromSprintUseCaseImpl implements DropBacklogItemFrom
 		Sprint sprint = sprintRepository.getSprintById(input.getSprintId());
 		if(sprint == null) {
 			output.setDropSuccess(false);
-			output.setErrorMessage("Sorry, the sprint is not exist.");
+			output.setErrorMessage("Sorry, the sprint is not exist!");
 			return;
 		}
 		sprint.drop(input.getBacklogItemId());

@@ -23,7 +23,6 @@ public class EditSprintRestfulAPI implements EditSprintOutput{
 	private EditSprintUseCase editSprintUseCase = applicationContext.newEditSprintUseCase();
 	
 	private boolean editSuccess;
-	private boolean overlap;
 	private String errorMessage;
 
 	@PUT
@@ -55,7 +54,7 @@ public class EditSprintRestfulAPI implements EditSprintOutput{
 		} catch (JSONException e) {
 			e.printStackTrace();
 			output.setEditSuccess(false);
-			output.setErrorMessage("Sorry, please try again!");
+			output.setErrorMessage("Sorry, there is the service problem when edit the sprint. Please contact to the system administrator!");
 			return output;
 		}
 		
@@ -92,15 +91,5 @@ public class EditSprintRestfulAPI implements EditSprintOutput{
 	@Override
 	public void setErrorMessage(String errorMessage) {
 		this.errorMessage = errorMessage;
-	}
-
-	@Override
-	public boolean isOverlap() {
-		return overlap;
-	}
-
-	@Override
-	public void setOverlap(boolean overlap) {
-		this.overlap = overlap;
 	}
 }

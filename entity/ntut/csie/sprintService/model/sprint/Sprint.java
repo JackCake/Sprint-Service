@@ -39,20 +39,34 @@ public class Sprint {
 		this.setRetrospective("");
 	}
 	
-	public boolean isSprintOverlap(String otherStartDate, String otherEndDate) {
+	public boolean isSprintStartDateAfterEndDate() throws ParseException {
+		DateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		long thisSprintStartDate = 0;
+		long thisSprintEndDate = 0;
+		thisSprintStartDate = simpleDateFormat.parse(startDate).getTime();
+		thisSprintEndDate = simpleDateFormat.parse(endDate).getTime();
+		return thisSprintStartDate > thisSprintEndDate;
+	}
+	
+	public boolean isSprintStartDateAfterDemoDate() throws ParseException {
+		DateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		long thisSprintStartDate = 0;
+		long thisSprintDemoDate = 0;
+		thisSprintStartDate = simpleDateFormat.parse(startDate).getTime();
+		thisSprintDemoDate = simpleDateFormat.parse(demoDate).getTime();
+		return thisSprintStartDate > thisSprintDemoDate;
+	}
+	
+	public boolean isSprintOverlap(String otherStartDate, String otherEndDate) throws ParseException {
 		DateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		long thisSprintStartDate = 0;
 		long thisSprintEndDate = 0;
 		long otherSprintStartDate = 0;
 		long otherSprintEndDate = 0;
-		try {
-			thisSprintStartDate = simpleDateFormat.parse(startDate).getTime();
-			thisSprintEndDate = simpleDateFormat.parse(endDate).getTime();
-			otherSprintStartDate = simpleDateFormat.parse(otherStartDate).getTime();
-			otherSprintEndDate = simpleDateFormat.parse(otherEndDate).getTime();
-		} catch (ParseException e) {
-			System.out.println(e.getMessage());
-		}
+		thisSprintStartDate = simpleDateFormat.parse(startDate).getTime();
+		thisSprintEndDate = simpleDateFormat.parse(endDate).getTime();
+		otherSprintStartDate = simpleDateFormat.parse(otherStartDate).getTime();
+		otherSprintEndDate = simpleDateFormat.parse(otherEndDate).getTime();
 		if((thisSprintStartDate >= otherSprintStartDate && thisSprintStartDate <= otherSprintEndDate) ||
 			(thisSprintEndDate >= otherSprintStartDate	&& thisSprintEndDate <= otherSprintEndDate) ||
 			(thisSprintStartDate <= otherSprintStartDate && thisSprintEndDate >= otherSprintEndDate)) {
@@ -74,8 +88,12 @@ public class Sprint {
 		return thisSprintEndDate < today;
 	}
 	
-	public void commit(String backlogItemId) {
-		addCommittedBacklogItem(backlogItemId);
+	public void commit(String backlogItemId) throws Exception {
+		CommittedBacklogItem committedBacklogItem = CommittedBacklogItemBuilder.newInstance()
+				.backlogItemId(backlogItemId)
+				.sprintId(sprintId)
+				.build();
+		committedBacklogItems.add(committedBacklogItem);
 		DomainEventPublisher.getInstance().publish(new BacklogItemCommitted(
 				backlogItemId, goal));
 	}
@@ -87,10 +105,7 @@ public class Sprint {
 	}
 	
 	public void addCommittedBacklogItem(String backlogItemId) {
-		CommittedBacklogItem committedBacklogItem = CommittedBacklogItemBuilder.newInstance()
-				.backlogItemId(backlogItemId)
-				.sprintId(sprintId)
-				.build();
+		CommittedBacklogItem committedBacklogItem = new CommittedBacklogItem(backlogItemId, sprintId);
 		committedBacklogItems.add(committedBacklogItem);
 	}
 	

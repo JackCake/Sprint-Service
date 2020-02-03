@@ -1,5 +1,6 @@
 package ntut.csie.sprintService.useCase.sprint.edit;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,11 +27,32 @@ public class EditSprintUseCaseImpl implements EditSprintUseCase, EditSprintInput
 	@Override
 	public void execute(EditSprintInput input, EditSprintOutput output) {
 		String sprintId = input.getSprintId();
+		String goal = input.getGoal();
+		int interval = input.getInterval();
+		String startDate = input.getStartDate();
+		String demoDate = input.getDemoDate();
 		Sprint sprint = sprintRepository.getSprintById(sprintId);
 		if(sprint == null) {
 			output.setEditSuccess(false);
-			output.setOverlap(false);
-			output.setErrorMessage("Sorry, the sprint is not exist.");
+			output.setErrorMessage("Sorry, the sprint is not exist!");
+			return;
+		}
+		String exceptionMessage = "";
+		if(goal == null || goal.isEmpty()) {
+			exceptionMessage += "The goal of the sprint should be required!\n";
+		}
+		if(interval == 0) {
+			exceptionMessage += "The interval of the sprint should not be zero.\n";
+		}
+		if(startDate == null || startDate.isEmpty()) {
+			exceptionMessage += "The start date of the sprint should be required!\n";
+		}
+		if(demoDate == null || demoDate.isEmpty()) {
+			exceptionMessage += "The demo date of the sprint should be required!\n";
+		}
+		if(!exceptionMessage.isEmpty()) {
+			output.setEditSuccess(false);
+			output.setErrorMessage(exceptionMessage);
 			return;
 		}
 		Sprint originalSprint = sprint;
@@ -41,24 +63,32 @@ public class EditSprintUseCaseImpl implements EditSprintUseCase, EditSprintInput
 		sprint.setDemoDate(input.getDemoDate());
 		sprint.setDemoPlace(input.getDemoPlace());
 		sprint.setDaily(input.getDaily());
-		if(isSprintOverlap(originalSprint, sprint)) {
-			output.setEditSuccess(false);
-			output.setOverlap(true);
-			output.setErrorMessage("Sorry, the start date or the end date is overlap with the other sprint.");
-			return;
-		}
 		try {
+			if(sprint.isSprintStartDateAfterEndDate()) {
+				output.setEditSuccess(false);
+				output.setErrorMessage("Sorry, the start date must be before the end date!");
+				return;
+			}
+			if(sprint.isSprintStartDateAfterDemoDate()) {
+				output.setEditSuccess(false);
+				output.setErrorMessage("Sorry, the start date must be before the demo date!");
+				return;
+			}
+			if(isSprintOverlap(originalSprint, sprint)) {
+				output.setEditSuccess(false);
+				output.setErrorMessage("Sorry, the start date or the end date is overlap with the other sprint!");
+				return;
+			}
 			sprintRepository.save(sprint);
 		} catch (Exception e) {
 			output.setEditSuccess(false);
 			output.setErrorMessage(e.getMessage());
 			return;
 		}
-		output.setOverlap(false);
 		output.setEditSuccess(true);
 	}
 	
-	private boolean isSprintOverlap(Sprint originalSprint, Sprint editedSprint) {
+	private boolean isSprintOverlap(Sprint originalSprint, Sprint editedSprint) throws ParseException {
 		String productId = editedSprint.getProductId();
 		List<Sprint> sprintList = new ArrayList<>(sprintRepository.getSprintsByProductId(productId));
 		for(Sprint otherSprint : sprintList) {

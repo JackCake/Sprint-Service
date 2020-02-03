@@ -42,7 +42,7 @@ public class EditRetrospectiveRestfulAPI implements EditRetrospectiveOutput{
 		} catch (JSONException e) {
 			e.printStackTrace();
 			output.setEditSuccess(false);
-			output.setErrorMessage("Sorry, please try again!");
+			output.setErrorMessage("Sorry, there is the service problem when edit the retrospective. Please contact to the system administrator!");
 			return output;
 		}
 		

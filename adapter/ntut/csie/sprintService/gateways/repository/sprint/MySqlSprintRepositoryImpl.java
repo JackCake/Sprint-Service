@@ -85,7 +85,7 @@ public class MySqlSprintRepositoryImpl implements SprintRepository {
 		} catch(SQLException e) {
 			sqlDatabaseHelper.transactionError();
 			e.printStackTrace();
-			throw new Exception("Sorry, there is the problem when save the sprint. Please try again!");
+			throw new Exception("Sorry, there is the database problem when save the sprint. Please contact to the system administrator!");
 		} finally {
 			sqlDatabaseHelper.closePreparedStatement(preparedStatement);
 			sqlDatabaseHelper.releaseConnection();
@@ -102,17 +102,18 @@ public class MySqlSprintRepositoryImpl implements SprintRepository {
 				removeCommittedBacklogItem(committedBacklogItem);
 			}
 			
-			String sql = String.format("Delete From %s Where %s = '%s'",
+			SprintData data = sprintMapper.transformToSprintData(sprint);
+			String sql = String.format("Delete From %s Where %s = ?",
 					SprintTable.tableName,
-					SprintTable.sprintId,
-					sprint.getSprintId());
+					SprintTable.sprintId);
 			preparedStatement = sqlDatabaseHelper.getPreparedStatement(sql);
+			preparedStatement.setString(1, data.getSprintId());
 			preparedStatement.executeUpdate();
 			sqlDatabaseHelper.transactionEnd();
 		} catch(SQLException e) {
 			sqlDatabaseHelper.transactionError();
 			e.printStackTrace();
-			throw new Exception("Sorry, there is the problem when remove the sprint. Please try again!");
+			throw new Exception("Sorry, there is the database problem when remove the sprint. Please contact to the system administrator!");
 		} finally {
 			sqlDatabaseHelper.closePreparedStatement(preparedStatement);
 			sqlDatabaseHelper.releaseConnection();
@@ -124,14 +125,16 @@ public class MySqlSprintRepositoryImpl implements SprintRepository {
 		if(!sqlDatabaseHelper.isTransacting()) {
 			sqlDatabaseHelper.connectToDatabase();
 		}
+		PreparedStatement preparedStatement = null;
 		ResultSet resultSet = null;
 		Sprint sprint = null;
 		try {
-			String query = String.format("Select * From %s Where %s = '%s'",
+			String sql = String.format("Select * From %s Where %s = ?",
 					SprintTable.tableName,
-					SprintTable.sprintId,
-					sprintId);
-			resultSet = sqlDatabaseHelper.getResultSet(query);
+					SprintTable.sprintId);
+			preparedStatement = sqlDatabaseHelper.getPreparedStatement(sql);
+			preparedStatement.setString(1, sprintId);
+			resultSet = preparedStatement.executeQuery();
 			if (resultSet.first()) {
 				int orderId = resultSet.getInt(SprintTable.orderId);
 				String goal = resultSet.getString(SprintTable.goal);
@@ -164,6 +167,7 @@ public class MySqlSprintRepositoryImpl implements SprintRepository {
 			e.printStackTrace();
 		} finally {
 			sqlDatabaseHelper.closeResultSet(resultSet);
+			sqlDatabaseHelper.closePreparedStatement(preparedStatement);
 			if(!sqlDatabaseHelper.isTransacting()) {
 				sqlDatabaseHelper.releaseConnection();
 			}
@@ -176,15 +180,17 @@ public class MySqlSprintRepositoryImpl implements SprintRepository {
 		if(!sqlDatabaseHelper.isTransacting()) {
 			sqlDatabaseHelper.connectToDatabase();
 		}
+		PreparedStatement preparedStatement = null;
 		ResultSet resultSet = null;
 		Collection<Sprint> sprints = new ArrayList<>();
 		try {
-			String query = String.format("Select * From %s Where %s = '%s' Order By %s",
+			String sql = String.format("Select * From %s Where %s = ? Order By %s",
 					SprintTable.tableName, 
 					SprintTable.productId, 
-					productId, 
 					SprintTable.orderId);
-			resultSet = sqlDatabaseHelper.getResultSet(query);
+			preparedStatement = sqlDatabaseHelper.getPreparedStatement(sql);
+			preparedStatement.setString(1, productId);
+			resultSet = preparedStatement.executeQuery();
 			while (resultSet.next()) {
 				String sprintId = resultSet.getString(SprintTable.sprintId);
 				int orderId = resultSet.getInt(SprintTable.orderId);
@@ -218,6 +224,7 @@ public class MySqlSprintRepositoryImpl implements SprintRepository {
 			e.printStackTrace();
 		} finally {
 			sqlDatabaseHelper.closeResultSet(resultSet);
+			sqlDatabaseHelper.closePreparedStatement(preparedStatement);
 			if(!sqlDatabaseHelper.isTransacting()) {
 				sqlDatabaseHelper.releaseConnection();
 			}
@@ -238,24 +245,27 @@ public class MySqlSprintRepositoryImpl implements SprintRepository {
 	}
 
 	private void removeCommittedBacklogItem(CommittedBacklogItem committedBacklogItem) throws SQLException {
-		String sql = String.format("Delete From %s Where %s = '%s'",
+		CommittedBacklogItemData data = committedBacklogItemMapper.transformToCommittedBacklogItemData(committedBacklogItem);
+		String sql = String.format("Delete From %s Where %s = ?",
 				CommittedBacklogItemTable.tableName,
-				CommittedBacklogItemTable.backlogItemId,
-				committedBacklogItem.getBacklogItemId());
+				CommittedBacklogItemTable.backlogItemId);
 		PreparedStatement preparedStatement = sqlDatabaseHelper.getPreparedStatement(sql);
+		preparedStatement.setString(1, data.getBacklogItemId());
 		preparedStatement.executeUpdate();
 		sqlDatabaseHelper.closePreparedStatement(preparedStatement);
 	}
 	
 	private Collection<CommittedBacklogItemData> getCommittedBacklogItemDatasBySprintId(String sprintId) {
+		PreparedStatement preparedStatement = null;
 		ResultSet resultSet = null;
 		Collection<CommittedBacklogItemData> committedBacklogItemDatas = new ArrayList<>();
 		try {
-			String query = String.format("Select * From %s Where %s = '%s'",
+			String sql = String.format("Select * From %s Where %s = ?",
 					CommittedBacklogItemTable.tableName, 
-					CommittedBacklogItemTable.sprintId, 
-					sprintId);
-			resultSet = sqlDatabaseHelper.getResultSet(query);
+					CommittedBacklogItemTable.sprintId);
+			preparedStatement = sqlDatabaseHelper.getPreparedStatement(sql);
+			preparedStatement.setString(1, sprintId);
+			resultSet = preparedStatement.executeQuery();
 			while (resultSet.next()) {
 				String backlogItemId = resultSet.getString(CommittedBacklogItemTable.backlogItemId);
 				
@@ -269,6 +279,7 @@ public class MySqlSprintRepositoryImpl implements SprintRepository {
 			e.printStackTrace();
 		} finally {
 			sqlDatabaseHelper.closeResultSet(resultSet);
+			sqlDatabaseHelper.closePreparedStatement(preparedStatement);
 		}
 		return committedBacklogItemDatas;
 	}

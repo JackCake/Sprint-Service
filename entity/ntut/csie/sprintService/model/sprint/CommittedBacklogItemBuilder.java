@@ -18,7 +18,15 @@ public class CommittedBacklogItemBuilder {
 		return this;
 	}
 	
-	public CommittedBacklogItem build() {
+	public CommittedBacklogItem build() throws Exception {
+		String exceptionMessage = "";
+		if(backlogItemId == null || backlogItemId.isEmpty()) {
+			exceptionMessage += "The backlog item id of the committed backlog item should be required!\n";
+		}
+		if(!exceptionMessage.isEmpty()) {
+			throw new Exception(exceptionMessage);
+		}
+		
 		CommittedBacklogItem committedBacklogItem = new CommittedBacklogItem(backlogItemId, sprintId);
 		return committedBacklogItem;
 	}

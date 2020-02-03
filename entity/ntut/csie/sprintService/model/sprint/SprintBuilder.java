@@ -65,19 +65,22 @@ public class SprintBuilder {
 	
 	public Sprint build() throws Exception{
 		String exceptionMessage = "";
-		if(goal == null) {
-			exceptionMessage += "The goal of the sprint should not be null.\n";
+		if(goal == null || goal.isEmpty()) {
+			exceptionMessage += "The goal of the sprint should be required!\n";
 		}
 		if(interval == 0) {
-			exceptionMessage += "The interval of the sprint should not be zero.\n";
+			exceptionMessage += "The interval of the sprint should not be zero!\n";
 		}
-		if(startDate == null) {
-			exceptionMessage += "The start date of the sprint should not be null.\n";
+		if(startDate == null || startDate.isEmpty()) {
+			exceptionMessage += "The start date of the sprint should be required!\n";
 		}
-		if(demoDate == null) {
-			exceptionMessage += "The demo date of the sprint should not be null.\n";
+		if(demoDate == null || demoDate.isEmpty()) {
+			exceptionMessage += "The demo date of the sprint should be required!\n";
 		}
-		if(!exceptionMessage.equals("")) {
+		if(productId == null || productId.isEmpty()) {
+			exceptionMessage += "The product id of the sprint should be required!\n";
+		}
+		if(!exceptionMessage.isEmpty()) {
 			throw new Exception(exceptionMessage);
 		}
 		

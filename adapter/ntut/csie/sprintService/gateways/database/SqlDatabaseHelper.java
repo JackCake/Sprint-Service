@@ -61,7 +61,7 @@ public class SqlDatabaseHelper {
 		String sql = "Create Table If Not Exists " + SprintTable.tableName + " ("
 				+ SprintTable.sprintId + " Varchar(50) Not Null, "
 				+ SprintTable.orderId + " Integer Not Null, "
-				+ SprintTable.goal + " Varchar(256) Not Null, "
+				+ SprintTable.goal + " Varchar(255) Not Null, "
 				+ SprintTable.sprintInterval + " TinyInt(3) Unsigned Not Null Default '0', "
 				+ SprintTable.startDate + " Date Not Null, "
 				+ SprintTable.endDate + " Date Not Null, "
@@ -69,7 +69,7 @@ public class SqlDatabaseHelper {
 				+ SprintTable.demoPlace + " Varchar(50), "
 				+ SprintTable.daily + " Varchar(50), "
 				+ SprintTable.productId + " Varchar(50) Not Null, "
-				+ SprintTable.retrospective + " Varchar(256), "
+				+ SprintTable.retrospective + " Varchar(255), "
 				+ "Primary Key (" + SprintTable.sprintId + ")"
 				+ ")";
 		try {
@@ -148,12 +148,6 @@ public class SqlDatabaseHelper {
 	public PreparedStatement getPreparedStatement(String sql) throws SQLException {
 		PreparedStatement preparedStatement = connection.prepareStatement(sql);
 		return preparedStatement;
-	}
-	
-	public ResultSet getResultSet(String query) throws SQLException {
-		Statement statement = connection.createStatement();
-		ResultSet resultSet = statement.executeQuery(query);
-		return resultSet;
 	}
 	
 	public void closeStatement(Statement statement) {

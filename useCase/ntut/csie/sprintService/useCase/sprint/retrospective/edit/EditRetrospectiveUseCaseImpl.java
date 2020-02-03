@@ -18,7 +18,7 @@ public class EditRetrospectiveUseCaseImpl implements EditRetrospectiveUseCase, E
 		Sprint sprint = sprintRepository.getSprintById(input.getSprintId());
 		if(sprint == null) {
 			output.setEditSuccess(false);
-			output.setErrorMessage("Sorry, the sprint is not exist.");
+			output.setErrorMessage("Sorry, the sprint is not exist!");
 			return;
 		}
 		sprint.setRetrospective(input.getRetrospective());

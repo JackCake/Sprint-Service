@@ -41,7 +41,7 @@ public class CommitBacklogItemToSprintRestfulAPI implements CommitBacklogItemToS
 		} catch (JSONException e) {
 			e.printStackTrace();
 			output.setCommitSuccess(false);
-			output.setErrorMessage("Sorry, please try again!");
+			output.setErrorMessage("Sorry, there is the service problem when commit the backlog item to the sprint. Please contact to the system administrator!");
 			return output;
 		}
 		
